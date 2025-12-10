@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
 function App() {
-  const [phase, setPhase] = useState('categories') // 'categories' | 'numbers' | 'question'
+  const [phase, setPhase] = useState('categories')
   const [categories, setCategories] = useState([])
   const [currentCategory, setCurrentCategory] = useState(null)
   const [questions, setQuestions] = useState([])
   const [currentQuestion, setCurrentQuestion] = useState(null)
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  // Carregar categorias
   useEffect(() => {
     loadCategories()
   }, [])
@@ -28,7 +28,6 @@ function App() {
     setLoading(false)
   }
 
-  // Carregar perguntas da categoria
   async function loadQuestions(theme) {
     setLoading(true)
     const { data, error } = await supabase
@@ -45,9 +44,9 @@ function App() {
     setLoading(false)
   }
 
-  // Carregar pergunta específica
   async function loadQuestion(id) {
     setLoading(true)
+    setSelectedAnswer(null)
     const { data, error } = await supabase
       .from('questions')
       .select('*')
@@ -61,21 +60,38 @@ function App() {
     setLoading(false)
   }
 
-  // Marcar pergunta como usada
   async function markAsUsed(id) {
     await supabase
       .from('questions')
       .update({ used: true })
       .eq('id', id)
     
-    // Recarregar perguntas da categoria
     loadQuestions(currentCategory)
     setPhase('numbers')
   }
 
+  function handleAnswerClick(option) {
+    setSelectedAnswer(option)
+  }
+
+  function getButtonStyle(option) {
+    if (!selectedAnswer) {
+      return { background: '#646cff' }
+    }
+    
+    if (option === currentQuestion.correct_option) {
+      return { background: '#4ade80' }
+    }
+    
+    if (option === selectedAnswer && option !== currentQuestion.correct_option) {
+      return { background: '#ef4444' }
+    }
+    
+    return { background: '#333', opacity: 0.5 }
+  }
+
   if (loading) return <div><h1>Carregando...</h1></div>
 
-  // Tela de categorias
   if (phase === 'categories') {
     return (
       <div>
@@ -91,7 +107,6 @@ function App() {
     )
   }
 
-  // Tela de números 1-30
   if (phase === 'numbers') {
     return (
       <div>
@@ -116,7 +131,6 @@ function App() {
     )
   }
 
-  // Tela da pergunta
   if (phase === 'question' && currentQuestion) {
     return (
       <div>
@@ -126,23 +140,48 @@ function App() {
         <div style={{ marginTop: '2rem' }}>
           <h3>{currentQuestion.question}</h3>
           
-          <div style={{ marginTop: '2rem' }}>
-            <p><strong>A)</strong> {currentQuestion.option_a}</p>
-            <p><strong>B)</strong> {currentQuestion.option_b}</p>
-            <p><strong>C)</strong> {currentQuestion.option_c}</p>
-            <p><strong>D)</strong> {currentQuestion.option_d}</p>
+          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <button 
+              onClick={() => handleAnswerClick('A')}
+              style={getButtonStyle('A')}
+              disabled={selectedAnswer !== null}
+            >
+              <strong>A)</strong> {currentQuestion.option_a}
+            </button>
+            
+            <button 
+              onClick={() => handleAnswerClick('B')}
+              style={getButtonStyle('B')}
+              disabled={selectedAnswer !== null}
+            >
+              <strong>B)</strong> {currentQuestion.option_b}
+            </button>
+            
+            <button 
+              onClick={() => handleAnswerClick('C')}
+              style={getButtonStyle('C')}
+              disabled={selectedAnswer !== null}
+            >
+              <strong>C)</strong> {currentQuestion.option_c}
+            </button>
+            
+            <button 
+              onClick={() => handleAnswerClick('D')}
+              style={getButtonStyle('D')}
+              disabled={selectedAnswer !== null}
+            >
+              <strong>D)</strong> {currentQuestion.option_d}
+            </button>
           </div>
 
-          <div style={{ marginTop: '2rem', padding: '1rem', background: '#2a2a2a', borderRadius: '8px' }}>
-            <p><strong>Resposta correta:</strong> {currentQuestion.correct_option}</p>
-          </div>
-
-          <button 
-            onClick={() => markAsUsed(currentQuestion.id)}
-            style={{ marginTop: '2rem', background: '#4ade80' }}
-          >
-            ✓ Marcar como Usada
-          </button>
+          {selectedAnswer && (
+            <button 
+              onClick={() => markAsUsed(currentQuestion.id)}
+              style={{ marginTop: '2rem', background: '#4ade80' }}
+            >
+              ✓ Marcar como Usada
+            </button>
+          )}
         </div>
       </div>
     )
@@ -152,4 +191,3 @@ function App() {
 }
 
 export default App
-
