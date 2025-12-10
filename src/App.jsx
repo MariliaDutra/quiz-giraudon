@@ -74,21 +74,26 @@ function App() {
     setSelectedAnswer(option)
   }
 
-  function getButtonStyle(option) {
+   function getButtonStyle(option) {
     if (!selectedAnswer) {
       return { background: '#646cff' }
     }
     
-    if (option === currentQuestion.correct_option) {
-      return { background: '#4ade80' }
+    const correctAnswer = currentQuestion.correct_option.toUpperCase().trim()
+    const selectedUpper = selectedAnswer.toUpperCase().trim()
+    const optionUpper = option.toUpperCase().trim()
+    
+    if (optionUpper === correctAnswer) {
+      return { background: '#4ade80', color: 'white' }
     }
     
-    if (option === selectedAnswer && option !== currentQuestion.correct_option) {
-      return { background: '#ef4444' }
+    if (optionUpper === selectedUpper && optionUpper !== correctAnswer) {
+      return { background: '#ef4444', color: 'white' }
     }
     
     return { background: '#333', opacity: 0.5 }
   }
+
 
   if (loading) return <div><h1>Carregando...</h1></div>
 
