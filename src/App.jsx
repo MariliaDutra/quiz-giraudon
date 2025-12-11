@@ -1,101 +1,103 @@
-import { useState, useEffect } from 'react'
-import { supabase } from './supabaseClient'
+import { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 
 function App() {
-  const [phase, setPhase] = useState('categories')
-  const [categories, setCategories] = useState([])
-  const [currentCategory, setCurrentCategory] = useState(null)
-  const [questions, setQuestions] = useState([])
-  const [currentQuestion, setCurrentQuestion] = useState(null)
-  const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [phase, setPhase] = useState('categories');
+  const [categories, setCategories] = useState([]);
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadCategories()
-  }, [])
+    loadCategories();
+  }, []);
 
   async function loadCategories() {
-    setLoading(true)
+    setLoading(true);
     const { data, error } = await supabase
       .from('questions')
       .select('theme')
-      .order('theme')
+      .order('theme');
     
     if (!error && data) {
-      const unique = [...new Set(data.map(q => q.theme))]
-      setCategories(unique)
+      const unique = [...new Set(data.map(q => q.theme))];
+      setCategories(unique);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   async function loadQuestions(theme) {
-    setLoading(true)
+    setLoading(true);
     const { data, error } = await supabase
       .from('questions')
-      .select('id, question_number, used')
+      .select('id, questionnumber, used')
       .eq('theme', theme)
-      .order('question_number')
+      .order('questionnumber');
     
     if (!error && data) {
-      setQuestions(data)
-      setCurrentCategory(theme)
-      setPhase('numbers')
+      setQuestions(data);
+      setCurrentCategory(theme);
+      setPhase('numbers');
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   async function loadQuestion(id) {
-    setLoading(true)
-    setSelectedAnswer(null)
+    setLoading(true);
+    setSelectedAnswer(null);
+    setShowCorrectAnswer(false);
+    
     const { data, error } = await supabase
       .from('questions')
       .select('*')
       .eq('id', id)
-      .single()
+      .single();
     
     if (!error && data) {
-      setCurrentQuestion(data)
-      setPhase('question')
+      setCurrentQuestion(data);
+      setPhase('question');
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   async function markAsUsed(id) {
     await supabase
       .from('questions')
       .update({ used: true })
-      .eq('id', id)
+      .eq('id', id);
     
-    loadQuestions(currentCategory)
-    setPhase('numbers')
+    loadQuestions(currentCategory);
+    setPhase('numbers');
   }
 
   function handleAnswerClick(option) {
-    setSelectedAnswer(option)
+    setSelectedAnswer(option);
   }
 
-   function getButtonStyle(option) {
-    if (!selectedAnswer) {
-      return { background: '#646cff' }
+  function getButtonStyle(option) {
+    if (!selectedAnswer) return { background: '#646cff' };
+    
+    const correctAnswer = currentQuestion.correctoption.toUpperCase().trim();
+    const selectedUpper = selectedAnswer.toUpperCase().trim();
+    const optionUpper = option.toUpperCase().trim();
+    
+    // Verde: só se showCorrectAnswer for true E for a correta
+    if (showCorrectAnswer && optionUpper === correctAnswer) {
+      return { background: '#4ade80', color: 'white' };
     }
     
-    const correctAnswer = currentQuestion.correct_option.toUpperCase().trim()
-    const selectedUpper = selectedAnswer.toUpperCase().trim()
-    const optionUpper = option.toUpperCase().trim()
-    
-    if (optionUpper === correctAnswer) {
-      return { background: '#4ade80', color: 'white' }
-    }
-    
+    // Vermelho: se clicou e errou
     if (optionUpper === selectedUpper && optionUpper !== correctAnswer) {
-      return { background: '#ef4444', color: 'white' }
+      return { background: '#ef4444', color: 'white' };
     }
     
-    return { background: '#333', opacity: 0.5 }
+    return { background: '#333', opacity: 0.5 };
   }
 
-
-  if (loading) return <div><h1>Carregando...</h1></div>
+  if (loading) return <div><h1>Carregando...</h1></div>;
 
   if (phase === 'categories') {
     return (
@@ -109,90 +111,96 @@ function App() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (phase === 'numbers') {
     return (
       <div>
         <h1>{currentCategory}</h1>
-        <button onClick={() => setPhase('categories')}>← Voltar para Categorias</button>
+        <button onClick={() => setPhase('categories')}>Voltar para Categorias</button>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem', marginTop: '2rem' }}>
           {questions.map(q => (
             <button
               key={q.id}
               onClick={() => loadQuestion(q.id)}
               disabled={q.used}
-              style={{ 
+              style={{
                 background: q.used ? '#333' : '#646cff',
                 textDecoration: q.used ? 'line-through' : 'none'
               }}
             >
-              {q.question_number}
+              {q.questionnumber}
             </button>
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (phase === 'question' && currentQuestion) {
     return (
       <div>
-        <h2>Pergunta {currentQuestion.question_number}</h2>
-        <button onClick={() => setPhase('numbers')}>← Voltar para Números</button>
+        <h2>Pergunta {currentQuestion.questionnumber}</h2>
+        <button onClick={() => setPhase('numbers')}>Voltar para Números</button>
         
         <div style={{ marginTop: '2rem' }}>
           <h3>{currentQuestion.question}</h3>
           
           <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button 
+            <button
               onClick={() => handleAnswerClick('A')}
               style={getButtonStyle('A')}
               disabled={selectedAnswer !== null}
             >
-              <strong>A)</strong> {currentQuestion.option_a}
+              <strong>A:</strong> {currentQuestion.optiona}
             </button>
-            
-            <button 
+            <button
               onClick={() => handleAnswerClick('B')}
               style={getButtonStyle('B')}
               disabled={selectedAnswer !== null}
             >
-              <strong>B)</strong> {currentQuestion.option_b}
+              <strong>B:</strong> {currentQuestion.optionb}
             </button>
-            
-            <button 
+            <button
               onClick={() => handleAnswerClick('C')}
               style={getButtonStyle('C')}
               disabled={selectedAnswer !== null}
             >
-              <strong>C)</strong> {currentQuestion.option_c}
+              <strong>C:</strong> {currentQuestion.optionc}
             </button>
-            
-            <button 
+            <button
               onClick={() => handleAnswerClick('D')}
               style={getButtonStyle('D')}
               disabled={selectedAnswer !== null}
             >
-              <strong>D)</strong> {currentQuestion.option_d}
+              <strong>D:</strong> {currentQuestion.optiond}
             </button>
           </div>
 
-          {selectedAnswer && (
+          {selectedAnswer && !showCorrectAnswer && (
             <button 
+              onClick={() => setShowCorrectAnswer(true)}
+              style={{ marginTop: '2rem', background: '#fbbf24', color: '#000' }}
+            >
+              Mostrar Resposta
+            </button>
+          )}
+
+          {showCorrectAnswer && (
+            <button
               onClick={() => markAsUsed(currentQuestion.id)}
               style={{ marginTop: '2rem', background: '#4ade80' }}
             >
-              ✓ Marcar como Usada
+              Marcar como Usada
             </button>
           )}
         </div>
       </div>
-    )
+    );
   }
 
-  return null
+  return null;
 }
 
-export default App
+export default App;
