@@ -7,8 +7,9 @@ function App() {
   const [currentCategory, setCurrentCategory] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
+  const [correctAnswered, setCorrectAnswered] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -55,8 +56,9 @@ function App() {
 
   async function loadQuestion(id) {
     setLoading(true);
-    setSelectedAnswer(null);
+    setSelectedAnswers([]);
     setShowCorrectAnswer(false);
+    setCorrectAnswered(false);
     
     const { data, error } = await supabase
       .from('questions')
@@ -86,27 +88,42 @@ function App() {
   }
 
   function handleAnswerClick(option) {
-    setSelectedAnswer(option);
+    // Não deixa clicar se já acertou ou já clicou nessa opção
+    if (correctAnswered || selectedAnswers.includes(option)) return;
+    
+    const correctAnswer = currentQuestion.correct_option.toUpperCase().trim();
+    const optionUpper = option.toUpperCase().trim();
+    
+    // Adiciona a resposta clicada ao array
+    setSelectedAnswers([...selectedAnswers, option]);
+    
+    // Se acertou, marca como correto
+    if (optionUpper === correctAnswer) {
+      setCorrectAnswered(true);
+    }
   }
 
   function getButtonStyle(option) {
-    if (!selectedAnswer) return { background: '#646cff' };
-    
     const correctAnswer = currentQuestion.correct_option.toUpperCase().trim();
-    const selectedUpper = selectedAnswer.toUpperCase().trim();
     const optionUpper = option.toUpperCase().trim();
     
-    // Verde: só se showCorrectAnswer for true E for a correta
-    if (showCorrectAnswer && optionUpper === correctAnswer) {
+    // Verde: se acertou OU se apertou "Mostrar Resposta"
+    if ((correctAnswered || showCorrectAnswer) && optionUpper === correctAnswer) {
       return { background: '#4ade80', color: 'white' };
     }
     
-    // Vermelho: se clicou e errou
-    if (optionUpper === selectedUpper && optionUpper !== correctAnswer) {
+    // Vermelho: se clicou e está errada
+    if (selectedAnswers.includes(option) && optionUpper !== correctAnswer) {
       return { background: '#ef4444', color: 'white' };
     }
     
-    return { background: '#333', opacity: 0.5 };
+    // Cinza: se já clicou nela (para não clicar de novo)
+    if (selectedAnswers.includes(option)) {
+      return { background: '#333', opacity: 0.5, cursor: 'not-allowed' };
+    }
+    
+    // Azul: ainda não clicou
+    return { background: '#646cff' };
   }
 
   if (loading) return <div><h1>Carregando...</h1></div>;
@@ -163,34 +180,41 @@ function App() {
             <button
               onClick={() => handleAnswerClick('A')}
               style={getButtonStyle('A')}
-              disabled={selectedAnswer !== null}
             >
               <strong>A:</strong> {currentQuestion.option_a}
             </button>
             <button
               onClick={() => handleAnswerClick('B')}
               style={getButtonStyle('B')}
-              disabled={selectedAnswer !== null}
             >
               <strong>B:</strong> {currentQuestion.option_b}
             </button>
             <button
               onClick={() => handleAnswerClick('C')}
               style={getButtonStyle('C')}
-              disabled={selectedAnswer !== null}
             >
               <strong>C:</strong> {currentQuestion.option_c}
             </button>
             <button
               onClick={() => handleAnswerClick('D')}
               style={getButtonStyle('D')}
-              disabled={selectedAnswer !== null}
             >
               <strong>D:</strong> {currentQuestion.option_d}
             </button>
           </div>
 
-          {selectedAnswer && !showCorrectAnswer && (
+          {/* Se ACERTOU: mostra direto o botão de marcar como usada */}
+          {correctAnswered && (
+            <button
+              onClick={() => markAsUsed(currentQuestion.id)}
+              style={{ marginTop: '2rem', background: '#4ade80' }}
+            >
+              Marcar como Usada
+            </button>
+          )}
+
+          {/* Se ERROU e não acertou: mostra botão "Mostrar Resposta" */}
+          {selectedAnswers.length > 0 && !correctAnswered && !showCorrectAnswer && (
             <button 
               onClick={() => setShowCorrectAnswer(true)}
               style={{ marginTop: '2rem', background: '#fbbf24', color: '#000' }}
@@ -199,6 +223,7 @@ function App() {
             </button>
           )}
 
+          {/* Se mostrou a resposta: mostra botão de marcar como usada */}
           {showCorrectAnswer && (
             <button
               onClick={() => markAsUsed(currentQuestion.id)}
