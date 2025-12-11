@@ -22,7 +22,11 @@ function App() {
       .select('theme')
       .order('theme');
     
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao carregar categorias:', error);
+    }
+    
+    if (data) {
       const unique = [...new Set(data.map(q => q.theme))];
       setCategories(unique);
     }
@@ -33,11 +37,15 @@ function App() {
     setLoading(true);
     const { data, error } = await supabase
       .from('questions')
-      .select('id, questionnumber, used')
+      .select('id, question_number, used')
       .eq('theme', theme)
-      .order('questionnumber');
+      .order('question_number');
     
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao carregar perguntas:', error);
+    }
+    
+    if (data) {
       setQuestions(data);
       setCurrentCategory(theme);
       setPhase('numbers');
@@ -56,7 +64,11 @@ function App() {
       .eq('id', id)
       .single();
     
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao carregar pergunta:', error);
+    }
+    
+    if (data) {
       setCurrentQuestion(data);
       setPhase('question');
     }
@@ -80,7 +92,7 @@ function App() {
   function getButtonStyle(option) {
     if (!selectedAnswer) return { background: '#646cff' };
     
-    const correctAnswer = currentQuestion.correctoption.toUpperCase().trim();
+    const correctAnswer = currentQuestion.correct_option.toUpperCase().trim();
     const selectedUpper = selectedAnswer.toUpperCase().trim();
     const optionUpper = option.toUpperCase().trim();
     
@@ -130,7 +142,7 @@ function App() {
                 textDecoration: q.used ? 'line-through' : 'none'
               }}
             >
-              {q.questionnumber}
+              {q.question_number}
             </button>
           ))}
         </div>
@@ -141,7 +153,7 @@ function App() {
   if (phase === 'question' && currentQuestion) {
     return (
       <div>
-        <h2>Pergunta {currentQuestion.questionnumber}</h2>
+        <h2>Pergunta {currentQuestion.question_number}</h2>
         <button onClick={() => setPhase('numbers')}>Voltar para Números</button>
         
         <div style={{ marginTop: '2rem' }}>
@@ -153,28 +165,28 @@ function App() {
               style={getButtonStyle('A')}
               disabled={selectedAnswer !== null}
             >
-              <strong>A:</strong> {currentQuestion.optiona}
+              <strong>A:</strong> {currentQuestion.option_a}
             </button>
             <button
               onClick={() => handleAnswerClick('B')}
               style={getButtonStyle('B')}
               disabled={selectedAnswer !== null}
             >
-              <strong>B:</strong> {currentQuestion.optionb}
+              <strong>B:</strong> {currentQuestion.option_b}
             </button>
             <button
               onClick={() => handleAnswerClick('C')}
               style={getButtonStyle('C')}
               disabled={selectedAnswer !== null}
             >
-              <strong>C:</strong> {currentQuestion.optionc}
+              <strong>C:</strong> {currentQuestion.option_c}
             </button>
             <button
               onClick={() => handleAnswerClick('D')}
               style={getButtonStyle('D')}
               disabled={selectedAnswer !== null}
             >
-              <strong>D:</strong> {currentQuestion.optiond}
+              <strong>D:</strong> {currentQuestion.option_d}
             </button>
           </div>
 
