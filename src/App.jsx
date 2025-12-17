@@ -149,30 +149,32 @@ function App() {
     >
       <div
         style={{
-          width: "30vw",           // ocupa ~30% da largura da tela
+          width: "30vw",             // faixa de 30% da tela
+          marginRight: "8vw",        // afasta da borda direita
+          marginTop: "2rem",
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
-          marginTop: "2rem",
-          paddingRight: "3rem",    // ajuste fino da distância da borda
-          alignItems: "flex-end",
+          alignItems: "stretch",     // todos os botões com mesma largura
         }}
       >
-        <h1 style={{ textAlign: "right" }}>Escolha uma Categoria</h1>
+        <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
 
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => loadQuestions(cat)}
-            style={
-              cat === "Kids e Disney"
+            style={{
+              width: "100%",
+              textAlign: "center",
+              ...(cat === "Kids e Disney"
                 ? {
                     background: "#ffcc00",
                     color: "#000",
                     fontWeight: "bold",
                   }
-                : {}
-            }
+                : {}),
+            }}
           >
             {cat}
           </button>
