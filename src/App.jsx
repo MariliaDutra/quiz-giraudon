@@ -17,22 +17,32 @@ function App() {
   }, []);
 
   async function loadCategories() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('questions')
-      .select('theme')
-      .order('theme');
-    
-    if (error) {
-      console.error('Erro ao carregar categorias:', error);
-    }
-    
-    if (data) {
-      const unique = [...new Set(data.map(q => q.theme))];
-      setCategories(unique);
-    }
+  setLoading(true);
+
+  const { data, error } = await supabase
+    .from("questions")
+    .select("theme")
+    .order("theme");
+
+  if (error) {
+    console.error("Erro ao carregar categorias:", error);
     setLoading(false);
+    return;
   }
+
+  if (data) {
+    const unique = [...new Set(data.map((q) => q.theme))];
+
+    // coloca "Kids e Disney" no fim da lista
+    const kidsLabel = "Kids e Disney"; // use exatamente o texto que está no Supabase
+    const other = unique.filter((c) => c !== kidsLabel);
+    const ordered = [...other, kidsLabel];
+
+    setCategories(ordered);
+  }
+
+  setLoading(false);
+}
 
   async function loadQuestions(theme) {
     setLoading(true);
@@ -128,20 +138,46 @@ function App() {
 
   if (loading) return <div><h1>Carregando...</h1></div>;
 
-  if (phase === 'categories') {
-    return (
-      <div>
-        <h1>Escolha uma Categoria</h1>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '2rem' }}>
-          {categories.map(cat => (
-            <button key={cat} onClick={() => loadQuestions(cat)}>
-              {cat}
-            </button>
-          ))}
-        </div>
+ if (phase === "categories")
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        paddingRight: "4rem",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+          marginTop: "2rem",
+          alignItems: "flex-end",
+        }}
+      >
+        <h1 style={{ textAlign: "right" }}>Escolha uma Categoria</h1>
+
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => loadQuestions(cat)}
+            style={
+              cat === "Kids e Disney"
+                ? {
+                    background: "#ffcc00",
+                    color: "#000",
+                    fontWeight: "bold",
+                  }
+                : {}
+            }
+          >
+            {cat}
+          </button>
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
 
   if (phase === 'numbers') {
     return (
