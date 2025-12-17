@@ -144,63 +144,84 @@ function App() {
     );
   }
 
-  if (phase === "categories")
+  // TELA DE CATEGORIAS
+  if (phase === "categories") {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          width: "100vw",
-        }}
-      >
+      <>
+        {/* coluna de categorias à direita */}
         <div
           style={{
-            width: "30vw",
-            marginRight: "8vw",
-            marginTop: "2rem",
             display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-            alignItems: "stretch",
+            justifyContent: "flex-end",
+            width: "100vw",
           }}
         >
-          <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
+          <div
+            style={{
+              width: "30vw",
+              marginRight: "8vw",
+              marginTop: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              alignItems: "stretch",
+            }}
+          >
+            <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
 
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => loadQuestions(cat)}
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  ...(cat === "Kids e Disney"
+                    ? {
+                        background: "#ffcc00",
+                        color: "#000",
+                        fontWeight: "bold",
+                      }
+                    : {}),
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* botão SORTEAR CATEGORIA no meio da tela */}
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "25%", // ajusta horizontalmente em cima do Papai Noel
+            transform: "translate(-50%, -50%)",
+          }}
+        >
           <button
             onClick={handleRaffleCategory}
             style={{
-              width: "100%",
-              textAlign: "center",
-              background: "#f97316",
+              padding: "1.5rem 4rem",
+              fontSize: "1.6rem",
+              borderRadius: "12px",
+              background: "#22c55e",
+              color: "#000",
               fontWeight: "bold",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+              border: "none",
+              cursor: "pointer",
             }}
           >
-            🎲 Sortear Categoria
+            SORTEAR CATEGORIA
           </button>
-
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => loadQuestions(cat)}
-              style={{
-                width: "100%",
-                textAlign: "center",
-                ...(cat === "Kids e Disney"
-                  ? {
-                      background: "#ffcc00",
-                      color: "#000",
-                      fontWeight: "bold",
-                    }
-                  : {}),
-              }}
-            >
-              {cat}
-            </button>
-          ))}
         </div>
-      </div>
+      </>
     );
+  }
 
+  // TELA DE NÚMEROS
   if (phase === "numbers") {
     return (
       <div>
@@ -234,6 +255,7 @@ function App() {
     );
   }
 
+  // TELA DA PERGUNTA
   if (phase === "question" && currentQuestion) {
     return (
       <div>
