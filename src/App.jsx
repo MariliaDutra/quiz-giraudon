@@ -171,31 +171,63 @@ function App() {
           }}
         >
           <h1 style={{ marginBottom: "1rem" }}>Regras do Jogo</h1>
-          <ul
-            style={{
-              textAlign: "left",
-              marginTop: "1rem",
-              lineHeight: 1.5,
-              fontSize: "1rem",
-            }}
-          >
-            <li>
-              Os participantes serão sorteados para definir a ordem em que irão
-              jogar.
-            </li>
-            <li>O presente deve ser aberto ao ser conquistado.</li>
-            <li>Não há limite de vezes que um presente pode ser desafiado.</li>
-            <li>
-              A cada nova rodada, o participante pode escolher batalhar por um
-              presente da pilha ou desafiar um dos presentes que já saiu.
-            </li>
-            <li>
-              Caso não seja a sua vez e você sopre a resposta, você perde o
-              presente que já tem; se não tiver presente, vai para o fim da fila.
-            </li>
-            <li>Se ninguém acertar a pergunta, ninguém pega presente.</li>
-          </ul>
+         <ul
+  style={{
+    textAlign: "left",
+    marginTop: "1rem",
+    lineHeight: 1.5,
+    fontSize: "1rem",
+  }}
+>
+  <li>
+    A ordem dos participantes é definida por sorteio no início do jogo.
+  </li>
 
+  <li>
+    Cada rodada começa com a escolha de uma categoria, por sorteio ou pelos
+    botões do painel.
+  </li>
+
+  <li>
+    Quem está na vez responde à pergunta da rodada; se acertar, conquista um
+    presente (novo da pilha ou “roubado” de alguém).
+  </li>
+
+  <li>O presente deve ser aberto na hora para todo mundo ver o que está em jogo.</li>
+
+  <li>
+    Um mesmo presente pode ser desafiado e trocado quantas vezes for necessário
+    ao longo do jogo.
+  </li>
+
+  <li>
+    Na sua vez, você pode escolher:
+    <ul style={{ marginLeft: "1.5rem", marginTop: "0.25rem" }}>
+      <li>Pegar um presente novo da pilha, ou</li>
+      <li>Desafiar o presente de outra pessoa, respondendo uma pergunta.</li>
+    </ul>
+  </li>
+
+  <li>
+    Se você desafiar o presente de alguém e acertar, fica com aquele presente;
+    se errar, não ganha presente na rodada.
+  </li>
+
+  <li>
+    Caso não seja a sua vez e você sopre a resposta:
+    <ul style={{ marginLeft: "1.5rem", marginTop: "0.25rem" }}>
+      <li>Se já tiver presente, perde o presente.</li>
+      <li>Se não tiver presente, vai para o fim da fila.</li>
+    </ul>
+  </li>
+
+  <li>Se ninguém acertar a pergunta de uma rodada, nenhum presente é entregue.</li>
+
+  <li>
+    O jogo termina quando todos tiverem pelo menos um presente ou quando
+    acabarem os presentes da pilha.
+  </li>
+</ul>
           <button
             onClick={() => setShowRules(false)}
             style={{
