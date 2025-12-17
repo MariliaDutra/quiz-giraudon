@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 
 function App() {
   const [phase, setPhase] = useState("categories");
+  const [showRules, setShowRules] = useState(true);
   const [categories, setCategories] = useState([]);
   const [raffleCategories, setRaffleCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState(null);
@@ -136,10 +137,82 @@ function App() {
     loadQuestions(chosen);
   }
 
+  // LOADING
   if (loading) {
     return (
       <div>
         <h1>Carregando...</h1>
+      </div>
+    );
+  }
+
+  // TELA DE REGRAS (só enquanto showRules === true)
+  if (showRules) {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "rgba(0,0,0,0.6)",
+          color: "white",
+          textAlign: "center",
+          padding: "2rem",
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(0,0,0,0.85)",
+            padding: "2.5rem 3rem",
+            borderRadius: "16px",
+            maxWidth: "700px",
+          }}
+        >
+          <h1 style={{ marginBottom: "1rem" }}>Regras do Jogo</h1>
+          <ul
+            style={{
+              textAlign: "left",
+              marginTop: "1rem",
+              lineHeight: 1.5,
+              fontSize: "1rem",
+            }}
+          >
+            <li>
+              Os participantes serão sorteados para definir a ordem em que irão
+              jogar.
+            </li>
+            <li>O presente deve ser aberto ao ser conquistado.</li>
+            <li>Não há limite de vezes que um presente pode ser desafiado.</li>
+            <li>
+              A cada nova rodada, o participante pode escolher batalhar por um
+              presente da pilha ou desafiar um dos presentes que já saiu.
+            </li>
+            <li>
+              Caso não seja a sua vez e você sopre a resposta, você perde o
+              presente que já tem; se não tiver presente, vai para o fim da fila.
+            </li>
+            <li>Se ninguém acertar a pergunta, ninguém pega presente.</li>
+          </ul>
+
+          <button
+            onClick={() => setShowRules(false)}
+            style={{
+              marginTop: "2rem",
+              padding: "1rem 2.5rem",
+              fontSize: "1.1rem",
+              borderRadius: "999px",
+              background: "#dc2626",
+              color: "#fff",
+              border: "none",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Começar o jogo
+          </button>
+        </div>
       </div>
     );
   }
@@ -167,7 +240,7 @@ function App() {
               alignItems: "stretch",
             }}
           >
-            <h1 style={{ textAlign: "center" }}>Categorias</h1>
+            <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
 
             {categories.map((cat) => (
               <button
@@ -196,7 +269,7 @@ function App() {
           style={{
             position: "fixed",
             top: "50%",
-            left: "25%", // ajusta horizontalmente em cima do Papai Noel
+            left: "25%",
             transform: "translate(-50%, -50%)",
           }}
         >
