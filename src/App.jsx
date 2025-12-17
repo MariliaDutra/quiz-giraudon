@@ -144,15 +144,17 @@ function App() {
       style={{
         display: "flex",
         justifyContent: "flex-end",
-        paddingRight: "4rem",
+        width: "100vw",
       }}
     >
       <div
         style={{
+          width: "30vw",           // ocupa ~30% da largura da tela
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
           marginTop: "2rem",
+          paddingRight: "3rem",    // ajuste fino da distância da borda
           alignItems: "flex-end",
         }}
       >
