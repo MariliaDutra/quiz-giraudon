@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
+import { useState, useEffect } from "react";
+import { supabase } from "./supabaseClient";
 
 function App() {
-  const [phase, setPhase] = useState('categories');
+  const [phase, setPhase] = useState("categories");
   const [categories, setCategories] = useState([]);
+  const [raffleCategories, setRaffleCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -17,49 +18,51 @@ function App() {
   }, []);
 
   async function loadCategories() {
-  setLoading(true);
+    setLoading(true);
 
-  const { data, error } = await supabase
-    .from("questions")
-    .select("theme")
-    .order("theme");
+    const { data, error } = await supabase
+      .from("questions")
+      .select("theme")
+      .order("theme");
 
-  if (error) {
-    console.error("Erro ao carregar categorias:", error);
+    if (error) {
+      console.error("Erro ao carregar categorias:", error);
+      setLoading(false);
+      return;
+    }
+
+    if (data) {
+      const unique = [...new Set(data.map((q) => q.theme))];
+
+      const kidsLabel = "Kids e Disney";
+      const other = unique.filter((c) => c !== kidsLabel);
+      const ordered = [...other, kidsLabel];
+
+      setCategories(ordered);
+
+      const raffle = ordered.filter((c) => c && c !== kidsLabel);
+      setRaffleCategories(raffle);
+    }
+
     setLoading(false);
-    return;
   }
-
-  if (data) {
-    const unique = [...new Set(data.map((q) => q.theme))];
-
-    // coloca "Kids e Disney" no fim da lista
-    const kidsLabel = "Kids e Disney"; // use exatamente o texto que está no Supabase
-    const other = unique.filter((c) => c !== kidsLabel);
-    const ordered = [...other, kidsLabel];
-
-    setCategories(ordered);
-  }
-
-  setLoading(false);
-}
 
   async function loadQuestions(theme) {
     setLoading(true);
     const { data, error } = await supabase
-      .from('questions')
-      .select('id, question_number, used')
-      .eq('theme', theme)
-      .order('question_number');
-    
+      .from("questions")
+      .select("id, question_number, used")
+      .eq("theme", theme)
+      .order("question_number");
+
     if (error) {
-      console.error('Erro ao carregar perguntas:', error);
+      console.error("Erro ao carregar perguntas:", error);
     }
-    
+
     if (data) {
       setQuestions(data);
       setCurrentCategory(theme);
-      setPhase('numbers');
+      setPhase("numbers");
     }
     setLoading(false);
   }
@@ -69,45 +72,39 @@ function App() {
     setSelectedAnswers([]);
     setShowCorrectAnswer(false);
     setCorrectAnswered(false);
-    
+
     const { data, error } = await supabase
-      .from('questions')
-      .select('*')
-      .eq('id', id)
+      .from("questions")
+      .select("*")
+      .eq("id", id)
       .single();
-    
+
     if (error) {
-      console.error('Erro ao carregar pergunta:', error);
+      console.error("Erro ao carregar pergunta:", error);
     }
-    
+
     if (data) {
       setCurrentQuestion(data);
-      setPhase('question');
+      setPhase("question");
     }
     setLoading(false);
   }
 
   async function markAsUsed(id) {
-    await supabase
-      .from('questions')
-      .update({ used: true })
-      .eq('id', id);
-    
+    await supabase.from("questions").update({ used: true }).eq("id", id);
+
     loadQuestions(currentCategory);
-    setPhase('numbers');
+    setPhase("numbers");
   }
 
   function handleAnswerClick(option) {
-    // Não deixa clicar se já acertou ou já clicou nessa opção
     if (correctAnswered || selectedAnswers.includes(option)) return;
-    
+
     const correctAnswer = currentQuestion.correct_option.toUpperCase().trim();
     const optionUpper = option.toUpperCase().trim();
-    
-    // Adiciona a resposta clicada ao array
+
     setSelectedAnswers([...selectedAnswers, option]);
-    
-    // Se acertou, marca como correto
+
     if (optionUpper === correctAnswer) {
       setCorrectAnswered(true);
     }
@@ -116,87 +113,117 @@ function App() {
   function getButtonStyle(option) {
     const correctAnswer = currentQuestion.correct_option.toUpperCase().trim();
     const optionUpper = option.toUpperCase().trim();
-    
-    // Verde: se acertou OU se apertou "Mostrar Resposta"
+
     if ((correctAnswered || showCorrectAnswer) && optionUpper === correctAnswer) {
-      return { background: '#4ade80', color: 'white' };
+      return { background: "#4ade80", color: "white" };
     }
-    
-    // Vermelho: se clicou e está errada
+
     if (selectedAnswers.includes(option) && optionUpper !== correctAnswer) {
-      return { background: '#ef4444', color: 'white' };
+      return { background: "#ef4444", color: "white" };
     }
-    
-    // Cinza: se já clicou nela (para não clicar de novo)
+
     if (selectedAnswers.includes(option)) {
-      return { background: '#333', opacity: 0.5, cursor: 'not-allowed' };
+      return { background: "#333", opacity: 0.5, cursor: "not-allowed" };
     }
-    
-    // Azul: ainda não clicou
-    return { background: '#646cff' };
+
+    return { background: "#646cff" };
   }
 
-  if (loading) return <div><h1>Carregando...</h1></div>;
+  function handleRaffleCategory() {
+    if (!raffleCategories.length) return;
+    const randomIndex = Math.floor(Math.random() * raffleCategories.length);
+    const chosen = raffleCategories[randomIndex];
+    loadQuestions(chosen);
+  }
 
- if (phase === "categories")
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "flex-end",
-        width: "100vw",
-      }}
-    >
+  if (loading) {
+    return (
+      <div>
+        <h1>Carregando...</h1>
+      </div>
+    );
+  }
+
+  if (phase === "categories")
+    return (
       <div
         style={{
-          width: "30vw",             // faixa de 30% da tela
-          marginRight: "8vw",        // afasta da borda direita
-          marginTop: "2rem",
           display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-          alignItems: "stretch",     // todos os botões com mesma largura
+          justifyContent: "flex-end",
+          width: "100vw",
         }}
       >
-        <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
+        <div
+          style={{
+            width: "30vw",
+            marginRight: "8vw",
+            marginTop: "2rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            alignItems: "stretch",
+          }}
+        >
+          <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
 
-        {categories.map((cat) => (
           <button
-            key={cat}
-            onClick={() => loadQuestions(cat)}
+            onClick={handleRaffleCategory}
             style={{
               width: "100%",
               textAlign: "center",
-              ...(cat === "Kids e Disney"
-                ? {
-                    background: "#ffcc00",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }
-                : {}),
+              background: "#f97316",
+              fontWeight: "bold",
             }}
           >
-            {cat}
+            🎲 Sortear Categoria
           </button>
-        ))}
-      </div>
-    </div>
-  );
 
-  if (phase === 'numbers') {
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => loadQuestions(cat)}
+              style={{
+                width: "100%",
+                textAlign: "center",
+                ...(cat === "Kids e Disney"
+                  ? {
+                      background: "#ffcc00",
+                      color: "#000",
+                      fontWeight: "bold",
+                    }
+                  : {}),
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+
+  if (phase === "numbers") {
     return (
       <div>
         <h1>{currentCategory}</h1>
-        <button onClick={() => setPhase('categories')}>Voltar para Categorias</button>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem', marginTop: '2rem' }}>
-          {questions.map(q => (
+        <button onClick={() => setPhase("categories")}>
+          Voltar para Categorias
+        </button>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(6, 1fr)",
+            gap: "1rem",
+            marginTop: "2rem",
+          }}
+        >
+          {questions.map((q) => (
             <button
               key={q.id}
               onClick={() => loadQuestion(q.id)}
               disabled={q.used}
               style={{
-                background: q.used ? '#333' : '#646cff',
-                textDecoration: q.used ? 'line-through' : 'none'
+                background: q.used ? "#333" : "#646cff",
+                textDecoration: q.used ? "line-through" : "none",
               }}
             >
               {q.question_number}
@@ -207,67 +234,75 @@ function App() {
     );
   }
 
-  if (phase === 'question' && currentQuestion) {
+  if (phase === "question" && currentQuestion) {
     return (
       <div>
         <h2>Pergunta {currentQuestion.question_number}</h2>
-        <button onClick={() => setPhase('numbers')}>Voltar para Números</button>
-        
-        <div style={{ marginTop: '2rem' }}>
+        <button onClick={() => setPhase("numbers")}>
+          Voltar para Números
+        </button>
+
+        <div style={{ marginTop: "2rem" }}>
           <h3>{currentQuestion.question}</h3>
-          
-          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+          <div
+            style={{
+              marginTop: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
             <button
-              onClick={() => handleAnswerClick('A')}
-              style={getButtonStyle('A')}
+              onClick={() => handleAnswerClick("A")}
+              style={getButtonStyle("A")}
             >
               <strong>A:</strong> {currentQuestion.option_a}
             </button>
             <button
-              onClick={() => handleAnswerClick('B')}
-              style={getButtonStyle('B')}
+              onClick={() => handleAnswerClick("B")}
+              style={getButtonStyle("B")}
             >
               <strong>B:</strong> {currentQuestion.option_b}
             </button>
             <button
-              onClick={() => handleAnswerClick('C')}
-              style={getButtonStyle('C')}
+              onClick={() => handleAnswerClick("C")}
+              style={getButtonStyle("C")}
             >
               <strong>C:</strong> {currentQuestion.option_c}
             </button>
             <button
-              onClick={() => handleAnswerClick('D')}
-              style={getButtonStyle('D')}
+              onClick={() => handleAnswerClick("D")}
+              style={getButtonStyle("D")}
             >
               <strong>D:</strong> {currentQuestion.option_d}
             </button>
           </div>
 
-          {/* Se ACERTOU: mostra direto o botão de marcar como usada */}
           {correctAnswered && (
             <button
               onClick={() => markAsUsed(currentQuestion.id)}
-              style={{ marginTop: '2rem', background: '#4ade80' }}
+              style={{ marginTop: "2rem", background: "#4ade80" }}
             >
               Marcar como Usada
             </button>
           )}
 
-          {/* Se ERROU e não acertou: mostra botão "Mostrar Resposta" */}
-          {selectedAnswers.length > 0 && !correctAnswered && !showCorrectAnswer && (
-            <button 
-              onClick={() => setShowCorrectAnswer(true)}
-              style={{ marginTop: '2rem', background: '#fbbf24', color: '#000' }}
-            >
-              Mostrar Resposta
-            </button>
-          )}
+          {selectedAnswers.length > 0 &&
+            !correctAnswered &&
+            !showCorrectAnswer && (
+              <button
+                onClick={() => setShowCorrectAnswer(true)}
+                style={{ marginTop: "2rem", background: "#fbbf24", color: "#000" }}
+              >
+                Mostrar Resposta
+              </button>
+            )}
 
-          {/* Se mostrou a resposta: mostra botão de marcar como usada */}
           {showCorrectAnswer && (
             <button
               onClick={() => markAsUsed(currentQuestion.id)}
-              style={{ marginTop: '2rem', background: '#4ade80' }}
+              style={{ marginTop: "2rem", background: "#4ade80" }}
             >
               Marcar como Usada
             </button>
