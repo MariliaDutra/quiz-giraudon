@@ -167,7 +167,7 @@ function App() {
               alignItems: "stretch",
             }}
           >
-            <h1 style={{ textAlign: "center" }}>Escolha uma Categoria</h1>
+            <h1 style={{ textAlign: "center" }}>Categorias</h1>
 
             {categories.map((cat) => (
               <button
@@ -206,8 +206,8 @@ function App() {
               padding: "1.5rem 4rem",
               fontSize: "1.6rem",
               borderRadius: "12px",
-              background: "#22c55e",
-              color: "#000",
+              background: "#dc2626",
+              color: "#ffffff",
               fontWeight: "bold",
               boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
               border: "none",
