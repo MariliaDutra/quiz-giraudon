@@ -147,117 +147,134 @@ function App() {
   }
 
   // TELA DE REGRAS (só enquanto showRules === true)
-  if (showRules) {
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "rgba(0,0,0,0.6)",
-          color: "white",
-          textAlign: "center",
-          padding: "2rem",
-        }}
-      >
-        <div
-          style={{
-            background: "rgba(0,0,0,0.85)",
-            padding: "2.5rem 3rem",
-            borderRadius: "16px",
-            maxWidth: "700px",
-          }}
-        >
-          <h1 style={{ marginBottom: "1rem" }}>Regras do Jogo</h1>
-         <ul
-  style={{
-    textAlign: "left",
-    marginTop: "1rem",
-    lineHeight: 1.5,
-    fontSize: "1rem",
-  }}
->
-  <li>
-    A ordem dos participantes é definida por sorteio no início do jogo.
-  </li>
+  if (showRules) return (
+  <div style={{
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e053a 100%)',
+    padding: '2rem',
+    gap: '2rem'
+  }}>
+    <div style={{
+      background: 'rgba(0,0,0,0.95)',
+      padding: '3rem',
+      borderRadius: '24px',
+      maxWidth: '1100px',
+      maxHeight: '90vh',
+      overflowY: 'auto',
+      boxShadow: '0 25px 50px rgba(0,0,0,0.8)',
+      border: '2px solid rgba(255,215,0,0.3)'
+    }}>
+      {/* TÍTULO NATALINO */}
+      <h1 style={{
+        textAlign: 'center',
+        fontSize: '3rem',
+        marginBottom: '2rem',
+        background: 'linear-gradient(45deg, #ffd700, #ff6b35)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textShadow: '0 0 30px rgba(255,215,0,0.5)'
+      }}>
+        🎄 Regras do Jogo de Natal 🎁
+      </h1>
 
-  <li>
-    Cada rodada começa com o sorteio da categoria pelos
-    botões do painel.
-  </li>
+      {/* DUAS COLUNAS */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '3rem',
+        fontSize: '1.3rem',
+        lineHeight: '1.6'
+      }}>
+        {/* COLUNA 1 - INÍCIO */}
+        <div>
+          <h2 style={{ color: '#ffd700', fontSize: '1.8rem', marginBottom: '1.5rem' }}>
+            🎯 Como Jogar
+          </h2>
+          <ol style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            <li>A ordem dos participantes é definida por sorteio no início! 🎲</li>
+            <li>Cada rodada começa com escolha de categoria (sorteio ou botões).</li>
+            <li>Quem está na vez responde a pergunta da rodada! ❓</li>
+          </ol>
+          
+          <h2 style={{ color: '#ffd700', fontSize: '1.8rem', margin: '2rem 0 1.5rem 0' }}>
+            🎁 Ganhando Presentes
+          </h2>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            <li>Acertou? Conquista presente novo da pilha OU roubado! 🥳</li>
+            <li>Abra na hora pra todo mundo ver! 👀</li>
+            <li>Mesmo presente pode ser desafiado várias vezes!</li>
+          </ul>
+        </div>
 
-  <li>
-    A primeira rodada competem os números 1 e 2. 
-    </li>
-           
-    <li>
-    A partir da segunda rodada, iniciada pelo número 3, ele já pode ou 
-      escolher roubar o presente da rodada anterior ou competir com o próximo
-      número. 
-    </li>
-     
-    <li> Quem consguir responder a pergunta da rodada; se acertar, conquista um
-    presente (novo da pilha ou “roubado” de alguém).
-    </li> 
-           <li> Caso erre, a outra pessoa tem o direito de responder. 
-           </li>
-  <li> O presente deve ser aberto na hora para todo mundo ver o que está em jogo.</li>
+        {/* COLUNA 2 - OPÇÕES E PUNIÇÕES */}
+        <div>
+          <h2 style={{ color: '#ffd700', fontSize: '1.8rem', marginBottom: '1.5rem' }}>
+            ⚡ Na Sua Vez
+          </h2>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            <li>Pegar presente novo da pilha 📦</li>
+            <li>OU desafiar presente de alguém respondendo pergunta! ⚔️</li>
+          </ul>
 
-  <li>
-    Um mesmo presente pode ser desafiado e trocado quantas vezes for necessário
-    ao longo do jogo.
-  </li>
+          <h2 style={{ color: '#ff4444', fontSize: '1.8rem', margin: '2rem 0 1.5rem 0' }}>
+            ⛔ Se Errar / Soprando
+          </h2>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            <li>Desafiar e errar = sem presente na rodada 😞</li>
+            <li>Soprar resposta (fora da vez):
+              <ul style={{ margin: '0.5rem 0 0 1.5rem', fontSize: '1.1rem' }}>
+                <li>Já tem presente? Perde! 😱</li>
+                <li>Não tem? Vai pro fim da fila! ⏳</li>
+              </ul>
+            </li>
+          </ul>
 
-  <li>
-    Na sua vez, você pode escolher:
-    <ul style={{ marginLeft: "1.5rem", marginTop: "0.25rem" }}>
-      <li>Pegar um presente novo da pilha, ou</li>
-      <li>Desafiar o presente de outra pessoa, respondendo uma pergunta.</li>
-    </ul>
-  </li>
-
-  <li>
-    Se você desafiar o presente de alguém e acertar, fica com aquele presente;
-    se errar, não ganha presente na rodada.
-  </li>
-
-  <li>
-    Caso não seja a sua vez e você sopre a resposta:
-    <ul style={{ marginLeft: "1.5rem", marginTop: "0.25rem" }}>
-      <li>Se já tiver presente, perde o presente.</li>
-      <li>Se não tiver presente, vai para o fim da fila.</li>
-    </ul>
-  </li>
-
-  <li>Se ninguém acertar a pergunta de uma rodada, nenhum presente é entregue.</li>
-
-  <li>
-    O jogo termina quando todos tiverem pelo menos um presente ou quando
-    acabarem os presentes da pilha.
-  </li>
-</ul>
-          <button
-            onClick={() => setShowRules(false)}
-            style={{
-              marginTop: "2rem",
-              padding: "1rem 2.5rem",
-              fontSize: "1.1rem",
-              borderRadius: "999px",
-              background: "#dc2626",
-              color: "#fff",
-              border: "none",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Começar o jogo
-          </button>
+          <h2 style={{ color: '#22c55e', fontSize: '1.8rem', margin: '2rem 0 1.5rem 0' }}>
+            🏁 Fim do Jogo
+          </h2>
+          <p style={{ fontSize: '1.2rem' }}>
+            Termina quando todos tiverem presente OU acabarem os da pilha! 🎉
+          </p>
         </div>
       </div>
-    );
-  }
+
+      {/* BOTÃO NATALINO */}
+      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <button 
+          onClick={() => { setShowRules(false); setPhase('teams'); }}
+          style={{
+            padding: '1.5rem 4rem',
+            fontSize: '1.6rem',
+            borderRadius: '50px',
+            background: 'linear-gradient(45deg, #dc2626, #ea580c)',
+            color: '#fff',
+            border: 'none',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 15px 35px rgba(220,38,38,0.6)',
+            transition: 'all 0.3s',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-5px)';
+            e.target.style.boxShadow = '0 20px 45px rgba(220,38,38,0.8)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 15px 35px rgba(220,38,38,0.6)';
+          }}
+        >
+          🎅 Começar o Jogo! 🎄
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
   // TELA DE CATEGORIAS
   if (phase === "categories") {
