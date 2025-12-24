@@ -178,7 +178,7 @@ function App() {
           fontSize: '1.8rem',
         }}
       >
-        Regras do Jogo
+       🎄 Regras do Jogo 🎁
       </h1>
 
       {/* DUAS COLUNAS, TEXTO NORMAL */}
