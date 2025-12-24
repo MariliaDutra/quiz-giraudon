@@ -253,7 +253,7 @@ function App() {
         <button
           onClick={() => {
             setShowRules(false);
-            setPhase('teams');
+            setPhase('categories');
           }}
           style={{
             marginTop: '0.5rem',
