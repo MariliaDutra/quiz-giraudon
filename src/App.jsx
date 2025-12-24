@@ -184,16 +184,26 @@ function App() {
   </li>
 
   <li>
-    Cada rodada começa com a escolha de uma categoria, por sorteio ou pelos
+    Cada rodada começa com o sorteio da categoria pelos
     botões do painel.
   </li>
 
   <li>
-    Quem está na vez responde à pergunta da rodada; se acertar, conquista um
+    A primeira rodada competem os números 1 e 2. 
+    </li>
+           
+    <li>
+    A partir da segunda rodada, iniciada pelo número 3, ele já pode ou 
+      escolher roubar o presente da rodada anterior ou competir com o próximo
+      número. 
+    </li>
+     
+    <li> Quem consguir responder a pergunta da rodada; se acertar, conquista um
     presente (novo da pilha ou “roubado” de alguém).
-  </li>
-
-  <li>O presente deve ser aberto na hora para todo mundo ver o que está em jogo.</li>
+    </li> 
+           <li> Caso erre, a outra pessoa tem o direito de responder. 
+           </li>
+  <li> O presente deve ser aberto na hora para todo mundo ver o que está em jogo.</li>
 
   <li>
     Um mesmo presente pode ser desafiado e trocado quantas vezes for necessário
